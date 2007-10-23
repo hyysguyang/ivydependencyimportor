@@ -1,0 +1,51 @@
+<!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
+<idea-plugin>
+  <name>IvyDependencyImportor</name>
+  <description>
+    Import all the libs which described in the ivy.xml will be imported to the current module library.
+    If you have any suggestion, please mail to me.
+  </description>
+  <change-notes>
+    <![CDATA[
+    <html>
+     Changes in v2.1<br>
+     <ul>
+     <li>Add i18n function, en_us and zh_cn are supported now.
+     <li>Fix a bug when click right mounse key on some certain files.
+     </ul>
+     Created at:2006-11-23 22:09
+    <hr>
+      Changes in v2.0:<br>
+      <ul>
+        <li>Add function to customize ivy pattern in IDE Settings.
+        <li>Fix some bugs in V1.0.
+       </ul>
+       Created at:2006-02-19 14:01
+      </html>
+     ]]>
+
+  </change-notes>
+  <version>2.1</version>
+  <vendor url="http://www.ceno.cn" email="zgong@ceno.cn">zgong</vendor>
+  <idea-version since-build="3000"/>
+  <application-components>
+    <component>
+      <implementation-class>gz.plugin.ivy.ImportorUI</implementation-class>
+    </component>
+  </application-components>
+  <actions>
+    <action class="gz.plugin.ivy.ImportAction" text="Import from ivy.xml" id="ivy_importor">
+      <add-to-group anchor="before" group-id="ProjectViewPopupMenu" relative-to-action="Compile"/>
+    </action>
+    <action id="Add lib" class="gz.plugin.addlib.AddLibAction" text="Add lib to current module"
+            description="Add some libs(e.g. jar files) to module's lib path">
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="ivy_importor"/>
+    </action>
+    <action class="gz.plugin.ivy.ExportAction" text="Export jars from ivy.xml" id="ivy_exportor">
+      <add-to-group anchor="after" group-id="ProjectViewPopupMenu" relative-to-action="ivy_importor"/>
+    </action>
+    <!--<action class="gz.plugin.OptimizeLib" text="OptimizeLib" id="iOptimizeLib">-->
+    <!--<add-to-group anchor="before" group-id="ProjectViewPopupMenu" relative-to-action="Compile"/>-->
+    <!--</action>-->
+  </actions>
+</idea-plugin>
