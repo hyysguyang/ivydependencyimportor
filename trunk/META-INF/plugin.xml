@@ -8,6 +8,11 @@
   <change-notes>
     <![CDATA[
     <html>
+     Changes in v2.2final<br>
+     <ul>
+     <li>Add single jar to jar library
+     <li>Add the function to export jars to a directory.
+     </ul>
      Changes in v2.1<br>
      <ul>
      <li>Add i18n function, en_us and zh_cn are supported now.
@@ -34,18 +39,14 @@
     </component>
   </application-components>
   <actions>
-    <action class="gz.plugin.ivy.ImportAction" text="Import from ivy.xml" id="ivy_importor">
-      <add-to-group anchor="before" group-id="ProjectViewPopupMenu" relative-to-action="Compile"/>
-    </action>
-    <action id="Add lib" class="gz.plugin.addlib.AddLibAction" text="Add lib to current module"
-            description="Add some libs(e.g. jar files) to module's lib path">
-      <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="ivy_importor"/>
-    </action>
-    <action class="gz.plugin.ivy.ExportAction" text="Export jars from ivy.xml" id="ivy_exportor">
-      <add-to-group anchor="after" group-id="ProjectViewPopupMenu" relative-to-action="ivy_importor"/>
-    </action>
-    <!--<action class="gz.plugin.OptimizeLib" text="OptimizeLib" id="iOptimizeLib">-->
-    <!--<add-to-group anchor="before" group-id="ProjectViewPopupMenu" relative-to-action="Compile"/>-->
-    <!--</action>-->
+    <group id="ivy" text="Ivy ..." popup="true">
+      <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+      <separator/>
+      <action id="Ivy_importor" class="gz.plugin.ivy.ImportAction" text="Import from ivy.xml"/>
+      <action id="Add lib" class="gz.plugin.addlib.AddLibAction" text="Add lib to current module"/>
+      <action id="Ivy_exportor" class="gz.plugin.ivy.ExportAction" text="Export jars from ivy.xml"/>
+      <separator/>
+    </group>
   </actions>
 </idea-plugin>

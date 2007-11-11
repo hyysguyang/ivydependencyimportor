@@ -50,7 +50,7 @@ public class ExportAction extends AnAction
         if (filename.equals("ivy.xml")) {
             String[] libs = new String[0];
             try {
-                libs = IvyUtil.getLibsFromIvy(virtualFile.getPath(), fullIvyURL,false);
+                libs = IvyUtil.getLibsFromIvy(virtualFile.getPath(), fullIvyURL, false);
                 Log.log(Arrays.asList(libs));
             }
             catch (JDOMException e) {
@@ -73,6 +73,17 @@ public class ExportAction extends AnAction
             Messages.showMessageDialog(module.getProject(), "Only ivy.xml will be accepted",
                                        "Wanning", Messages.getWarningIcon());
         }
+    }
+
+    public void update(AnActionEvent e)
+    {
+        VirtualFile virtualFile = (VirtualFile) e.getDataContext().getData(DataConstants.VIRTUAL_FILE);
+        if (virtualFile == null) {
+            e.getPresentation().setEnabled(false);
+            return;
+        }
+        String filename = virtualFile.getName();
+        e.getPresentation().setEnabled("ivy.xml".equals(filename));
     }
 
     public File selectFile(Module module)
