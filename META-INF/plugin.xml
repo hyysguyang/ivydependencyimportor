@@ -12,7 +12,10 @@
      <ul>
      <li>Add single jar to jar library
      <li>Add the function to export jars to a directory.
+     <li>This is the final version of 2.x. A complete new version will be developed later.
+      Welcome to visit the page:http://code.google.com/p/ivydependencyimportor and give us any suggestion.
      </ul>
+     <hr>
      Changes in v2.1<br>
      <ul>
      <li>Add i18n function, en_us and zh_cn are supported now.
@@ -30,8 +33,8 @@
      ]]>
 
   </change-notes>
-  <version>2.1</version>
-  <vendor url="http://www.ceno.cn" email="zgong@ceno.cn">zgong</vendor>
+  <version>2.2final</version>
+  <vendor url="http://code.google.com/p/ivydependencyimportor/" email="gzkaneg@gmail.com">Kane Gong</vendor>
   <idea-version since-build="3000"/>
   <application-components>
     <component>
