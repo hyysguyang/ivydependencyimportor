@@ -1,50 +1,53 @@
 package gz.plugin.ivy;
 
+import org.apache.ivy.core.resolve.ResolveOptions;
 import org.jdom.Element;
 
 /**
  * @author <a href="mailto:zgong@naesasoft.com">zgong</a>
  * @version $Id: MailGroup.java,v 1.2 2005/04/26 03:33:23 zgong Exp $
- */public class Setting
-{
+ */
+public class Setting {
     private String distPath = "";
     private String artifactPattern = "[organisation]/[module]/[revision]/[artifact].[ext]";
     private static Setting setting;
+    private ResolveOptions resolveOptions;
+    private String ivySettingFile;
+    private String ivyFile;
+    private String cacheDir;
+    private String repositoryDir;
 
-    private Setting()
-    {
+
+    private boolean useCache;
+
+
+    private Setting() {
     }
 
-    public String getDistPath()
-    {
+    public String getDistPath() {
         return distPath;
     }
 
-    public void setDistPath(String distPath)
-    {
+    public void setDistPath(String distPath) {
         this.distPath = distPath;
     }
 
-    public String getArtifactPattern()
-    {
+    public String getArtifactPattern() {
         return artifactPattern;
     }
 
-    public void setArtifactPattern(String artifactPattern)
-    {
+    public void setArtifactPattern(String artifactPattern) {
         this.artifactPattern = artifactPattern;
     }
 
-    public static Setting getSetting()
-    {
+    public static Setting getSetting() {
         if (setting == null) {
             setting = new Setting();
         }
         return setting;
     }
 
-    public void read(Element element)
-    {
+    public void read(Element element) {
         Element elMark = element.getChild("ivy_dependency_importor");
         if (elMark != null) {
             distPath = elMark.getAttributeValue("dist_lib_path");
@@ -52,8 +55,7 @@ import org.jdom.Element;
         }
     }
 
-    public void write(Element element)
-    {
+    public void write(Element element) {
 
         Element elMark = new Element("ivy_dependency_importor");
         if (distPath != null) {
@@ -64,4 +66,73 @@ import org.jdom.Element;
         }
         element.addContent(elMark);
     }
+
+    public String getIvySettingFile() {
+        return ivySettingFile;
+    }
+
+    public String getIvyFile() {
+        return ivyFile;
+    }
+
+    public ResolveOptions getResolveOptions() {
+        resolveOptions = new ResolveOptions();
+        resolveOptions = resolveOptions.setUseOrigin(isUseLocalRepository());
+        resolveOptions = resolveOptions.setTransitive(isTransitive());
+        return resolveOptions;
+    }
+
+    public void setIvySettingFile(String ivysettings) {
+
+        this.ivySettingFile = ivysettings;
+    }
+
+    public void setIvyFile(String ivyFile) {
+        this.ivyFile = ivyFile;
+    }
+
+    public String getCacheDir() {
+        return cacheDir;
+    }
+
+    public void setCacheDir(String cacheDir) {
+        this.cacheDir = cacheDir;
+    }
+
+    public void setRepositoryDir(String repositoryDir) {
+        this.repositoryDir = repositoryDir;
+    }
+
+    public String getRepositoryDir() {
+        return repositoryDir;
+    }
+
+    public void setUseLocalRepository(boolean useLocalRepository) {
+        setUseCache(!useLocalRepository);
+    }
+
+
+    public boolean isUseCache() {
+        return useCache;
+    }
+
+    public void setUseCache(boolean useCache) {
+        this.useCache = useCache;
+    }
+
+    public boolean isUseLocalRepository() {
+        return !isUseCache();
+    }
+
+    public void setTransitive(boolean transitive) {
+        this.transitive = transitive;
+    }
+
+    private boolean transitive;
+
+    public boolean isTransitive() {
+        return transitive;
+    }
 }
+
+
