@@ -1,0 +1,15 @@
+<ivy-module version="1.0">
+    <info organisation="ceno.common" module="solar"/>
+    <publications>
+        <artifact name="solar" type="jar"/>
+        <artifact name="solar-api" type="zip"/>
+        <artifact name="ivy" type="html"/>
+        <artifact name="ivy-report" type="css"/>
+    </publications>
+    <dependencies>
+        <!-- Run junit required  -->
+        <dependency org="org1" name="mod1.1" rev="1.0">
+            <artifact name="mod1.1" type="jar"/>
+        </dependency>
+    </dependencies>
+</ivy-module>
