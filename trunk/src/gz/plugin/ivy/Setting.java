@@ -11,14 +11,14 @@ public class Setting {
     private String distPath = "";
     private String artifactPattern = "[organisation]/[module]/[revision]/[artifact].[ext]";
     private static Setting setting;
+
+    
     private ResolveOptions resolveOptions;
     private String ivySettingFile;
     private String ivyFile;
     private String cacheDir;
     private String repositoryDir;
-
-
-    private boolean useCache;
+    private boolean useCache=false;
 
 
     private Setting() {
