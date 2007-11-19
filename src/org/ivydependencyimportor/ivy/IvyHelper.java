@@ -21,8 +21,9 @@ public class IvyHelper {
     private String filePathInCahe;
     private Setting setting;
 
-    Ivy ivy = null;
-    ResolveReport resolveReport;
+    private Ivy ivy = null;
+    private ResolveReport resolveReport;
+    private static final String IVY_REPO_DIR = "ivy.repo.dir";
 
 
     public String getFilePathInCahe() {
@@ -31,10 +32,7 @@ public class IvyHelper {
 
     public List<String> getFilePathinLocalRepo() {
         List<Artifact> arti = resolveReport.getArtifacts();
-
-
         List<String> list = new ArrayList<String>();
-
         CacheManager cacheManager = ivy.getCacheManager(new File(setting.getCacheDir()));
         for (Artifact artifact : arti) {
             list.add(cacheManager.getArchiveFileInCache(artifact).getAbsolutePath());
@@ -48,7 +46,7 @@ public class IvyHelper {
 
     public void resolve() throws Exception {
         ivy = Ivy.newInstance();
-        ivy.setVariable("ivy.repo.dir", setting.getRepositoryDir());
+        ivy.setVariable(IVY_REPO_DIR, setting.getRepositoryDir());
 
         ivy.configure(new File(setting.getIvySettingFile()));
         IvySettings ivySettings = ivy.getSettings();
@@ -57,6 +55,5 @@ public class IvyHelper {
         }
         ivySettings.setDefaultCache(new File(setting.getCacheDir()));
         resolveReport = ivy.resolve(new File(setting.getIvyFile()).toURL(), setting.getResolveOptions());
-
     }
 }
