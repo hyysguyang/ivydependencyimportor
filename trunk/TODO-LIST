@@ -1,0 +1,9 @@
+This is the suport requirement of ivy dependency importor that will be add.£º
+1.Refactor the dependent parse of ivy.xml£¬Use the ivy's resolver to parse the ivy.xml.
+2.Extract the IDE module that dependent idea and ivy module that dependent ivy.
+3.Add the latest ivy version support.
+4.Add automation associate sources to the idea of jar artifact.The sources can be found by ivy or 
+match from one source base dir that include source file.
+5.Add advance support that user can customize the ivysetting himself.
+6.Add search module from repository ,The supported repository include local ivy repository,
+share ivy repository,public ivy repository,local maven2 repository,public maven2 repository.
