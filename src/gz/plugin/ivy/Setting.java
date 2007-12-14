@@ -1,6 +1,9 @@
 package gz.plugin.ivy;
 
+import java.io.File;
+
 import org.apache.ivy.core.resolve.ResolveOptions;
+import org.apache.ivy.util.FileUtil;
 import org.jdom.Element;
 
 /**
@@ -19,6 +22,7 @@ public class Setting {
     private String cacheDir;
     private String repositoryDir;
     private boolean useCache=false;
+    private boolean includeSources=false;
 
 
     private Setting() {
@@ -95,9 +99,18 @@ public class Setting {
         return cacheDir;
     }
 
+ public File getCache() {
+     if(cacheDir==null||!new File(cacheDir).exists()){
+         return null;
+     }
+    return new File(cacheDir);
+
+    }
+
     public void setCacheDir(String cacheDir) {
         this.cacheDir = cacheDir;
     }
+
 
     public void setRepositoryDir(String repositoryDir) {
         this.repositoryDir = repositoryDir;
@@ -132,6 +145,11 @@ public class Setting {
 
     public boolean isTransitive() {
         return transitive;
+    }
+
+    public void setIncludeSources(boolean includeSources)
+    {
+        this.includeSources = includeSources;
     }
 }
 

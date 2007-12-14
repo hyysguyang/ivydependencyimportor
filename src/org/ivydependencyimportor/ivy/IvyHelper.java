@@ -30,14 +30,19 @@ public class IvyHelper {
         return filePathInCahe;
     }
 
-    public List<String> getFilePathinLocalRepo() {
-        List<Artifact> arti = resolveReport.getArtifacts();
+    public List<String> getJarArtifactsFilePath() {
+        List<Artifact> arti = getArtifacts();
         List<String> list = new ArrayList<String>();
         CacheManager cacheManager = ivy.getCacheManager(new File(setting.getCacheDir()));
         for (Artifact artifact : arti) {
             list.add(cacheManager.getArchiveFileInCache(artifact).getAbsolutePath());
         }
         return list;
+    }
+
+    public List<Artifact> getArtifacts()
+    {
+        return (List<Artifact>) resolveReport.getArtifacts();
     }
 
     public void setSetting(Setting setting) {
@@ -50,10 +55,10 @@ public class IvyHelper {
 
         ivy.configure(new File(setting.getIvySettingFile()));
         IvySettings ivySettings = ivy.getSettings();
-        if (setting.getCacheDir() == null) {
+        if (setting.getCache() == null) {
             setting.setCacheDir(ivySettings.getDefaultCache().getAbsolutePath());
         }
-        ivySettings.setDefaultCache(new File(setting.getCacheDir()));
+        ivySettings.setDefaultCache(setting.getCache());
         resolveReport = ivy.resolve(new File(setting.getIvyFile()).toURL(), setting.getResolveOptions());
     }
 }
