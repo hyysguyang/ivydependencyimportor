@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @author <a href="mailto:zgong@naesasoft.com">zgong</a>
+ * @author <a href="mailto:gzkaneg@gmail.com">gzkaneg</a>
  * @version $Id: MailGroup.java,v 1.2 2005/04/26 03:33:23 zgong Exp $
  */
 public class Log {
