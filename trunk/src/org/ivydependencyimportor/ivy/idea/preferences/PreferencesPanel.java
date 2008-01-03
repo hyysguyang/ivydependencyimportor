@@ -26,8 +26,7 @@ import gz.plugin.ivy.Setting;
 import gz.plugin.ivy.Log;
 
 /**
- * @author <a href="mailto:zgong@naesasoft.com">zgong</a>
- * @version $Id: MailGroup.java,v 1.2 2005/04/26 03:33:23 zgong Exp $
+ * @author <a href="mailto:gzkaneg@gmail.com">gzkaneg</a>
  */
 public class PreferencesPanel
 {
