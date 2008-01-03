@@ -16,13 +16,7 @@ public class Setting {
     private static Setting setting;
 
     
-    private ResolveOptions resolveOptions;
-    private String ivySettingFile;
-    private String ivyFile;
-    private String cacheDir;
-    private String repositoryDir;
-    private boolean useCache=false;
-    private boolean includeSources=false;
+
 
 
     private Setting() {
@@ -71,86 +65,8 @@ public class Setting {
         element.addContent(elMark);
     }
 
-    public String getIvySettingFile() {
-        return ivySettingFile;
-    }
-
-    public String getIvyFile() {
-        return ivyFile;
-    }
-
-    public ResolveOptions getResolveOptions() {
-        resolveOptions = new ResolveOptions();
-        resolveOptions = resolveOptions.setUseOrigin(isUseLocalRepository());
-        resolveOptions = resolveOptions.setTransitive(isTransitive());
-        return resolveOptions;
-    }
-
-    public void setIvySettingFile(String ivysettings) {
-
-        this.ivySettingFile = ivysettings;
-    }
-
-    public void setIvyFile(String ivyFile) {
-        this.ivyFile = ivyFile;
-    }
-
-    public String getCacheDir() {
-        return cacheDir;
-    }
-
- public File getCache() {
-     if(cacheDir==null||!new File(cacheDir).exists()){
-         return null;
-     }
-    return new File(cacheDir);
-
-    }
-
-    public void setCacheDir(String cacheDir) {
-        this.cacheDir = cacheDir;
-    }
 
 
-    public void setRepositoryDir(String repositoryDir) {
-        this.repositoryDir = repositoryDir;
-    }
-
-    public String getRepositoryDir() {
-        return repositoryDir;
-    }
-
-    public void setUseLocalRepository(boolean useLocalRepository) {
-        setUseCache(!useLocalRepository);
-    }
-
-
-    public boolean isUseCache() {
-        return useCache;
-    }
-
-    public void setUseCache(boolean useCache) {
-        this.useCache = useCache;
-    }
-
-    public boolean isUseLocalRepository() {
-        return !isUseCache();
-    }
-
-    public void setTransitive(boolean transitive) {
-        this.transitive = transitive;
-    }
-
-    private boolean transitive;
-
-    public boolean isTransitive() {
-        return transitive;
-    }
-
-    public void setIncludeSources(boolean includeSources)
-    {
-        this.includeSources = includeSources;
-    }
 }
 
 
