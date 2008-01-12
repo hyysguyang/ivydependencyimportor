@@ -8,3 +8,6 @@ match from one source base dir that include source file.
 6.Add advance support that user can customize the ivysetting himself.
 7.Add search module from repository ,The supported repository include local ivy repository,
   hare ivy repository,public ivy repository,local maven2 repository,public maven2 repository.
+8.Assoicate the ivy.xml to with idea module, automatically syncronize the other while one is changed.
+9.Provide two ways to import from ivy.xml, transitive and not.
+10.Import jars from svn repository.
