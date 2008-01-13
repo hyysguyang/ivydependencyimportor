@@ -3,7 +3,6 @@
  */
 package org.ivydependencyimportor.ivy;
 
-import gz.plugin.ivy.Setting;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.cache.CacheManager;
 import org.apache.ivy.core.module.descriptor.Artifact;
@@ -63,6 +62,6 @@ public class IvyFacade {
             ivyConfig.setCacheDir(ivySettings.getDefaultCache().getAbsolutePath());
         }
         ivySettings.setDefaultCache(ivyConfig.getCache());
-        resolveReport = ivy.resolve(new File(ivyConfig.getIvyFile()).toURL(), ivyConfig.getResolveOptions());
+        resolveReport = ivy.resolve(new File(ivyConfig.getIvyFile()).toURI().toURL(), ivyConfig.getResolveOptions());
     }
 }
