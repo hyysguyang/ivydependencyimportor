@@ -1,13 +1,16 @@
 <!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
 <idea-plugin>
-  <name>IvyDependencyImportor</name>
-  <description>
-    Import all the libs which described in the ivy.xml will be imported to the current module library.
-    If you have any suggestion, please mail to me.
-  </description>
-  <change-notes>
-    <![CDATA[
+    <name>IvyDependencyImportor</name>
+    <description>
+        Import all the libs which described in the ivy.xml will be imported to the current module library.
+        If you have any suggestion, please mail to me.
+    </description>
+    <change-notes>
+        <![CDATA[
     <html>
+     Changes in V3.0<br>
+     A new version. Changes will come soon.
+     <hr>
      Changes in v2.2final<br>
      <ul>
      <li>Add single jar to jar library
@@ -32,24 +35,30 @@
       </html>
      ]]>
 
-  </change-notes>
-  <version>2.2final</version>
-  <vendor url="http://code.google.com/p/ivydependencyimportor/" email="gzkaneg@gmail.com">Kane Gong</vendor>
-  <idea-version since-build="3000"/>
-  <application-components>
-    <component>
-      <implementation-class>gz.plugin.ivy.ImportorUI</implementation-class>
-    </component>
-  </application-components>
-  <actions>
-    <group id="ivy" text="Ivy ..." popup="true">
-      <add-to-group group-id="EditorPopupMenu" anchor="first"/>
-      <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
-      <separator/>
-      <action id="Ivy_importor" class="gz.plugin.ivy.ImportAction" text="Import from ivy.xml"/>
-      <action id="Add lib" class="gz.plugin.addlib.AddLibAction" text="Add lib to current module"/>
-      <action id="Ivy_exportor" class="gz.plugin.ivy.ExportAction" text="Export jars from ivy.xml"/>
-      <separator/>
-    </group>
-  </actions>
+    </change-notes>
+    <version>3.0</version>
+    <vendor url="http://code.google.com/p/ivydependencyimportor/" email="gzkaneg@gmail.com">
+        Kane Gong,hyysguyang
+    </vendor>
+    <idea-version since-build="3000"/>
+    <application-components>
+        <component>
+            <implementation-class>org.ivydependencyimportor.ivy.idea.setting.SettingHelper</implementation-class>
+        </component>
+        <component>
+            <implementation-class>org.ivydependencyimportor.ivy.idea.setting.SettingUI</implementation-class>
+        </component>
+    </application-components>
+    <actions>
+        <group id="ivy" text="Ivy ..." popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
+            <separator/>
+            <action id="Ivy_importor" class="org.ivydependencyimportor.ivy.idea.action.ImportAction"
+                    text="Import from ivy.xml"/>
+            <action id="Ivy_exportor" class="org.ivydependencyimportor.ivy.idea.action.ExportAction"
+                    text="Export jars from ivy.xml"/>
+            <separator/>
+        </group>
+    </actions>
 </idea-plugin>

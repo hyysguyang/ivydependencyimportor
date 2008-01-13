@@ -1,8 +1,4 @@
-package gz.plugin.ivy;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
+package org.ivydependencyimportor.ivy.idea.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -14,16 +10,23 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jdom.JDOMException;
+import org.ivydependencyimportor.ivy.IvyConfig;
+import org.ivydependencyimportor.ivy.IvyFacade;
+import org.ivydependencyimportor.ivy.Log;
+import org.ivydependencyimportor.ivy.idea.IdeaUtil;
+import org.ivydependencyimportor.ivy.idea.setting.SettingHelper;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * @author <a href="mailto:zgong@naesasoft.com">zgong</a>
- * @version $Id: MailGroup.java,v 1.2 2005/04/26 03:33:23 zgong Exp $
+ * @author <a href="mailto:gzkaneg@gmail.com">gzkaneg</a>
  */
-public class ExportAction extends AnAction
-{
-    public void actionPerformed(AnActionEvent event)
-    {
+public class ExportAction extends AnAction {
+    public void actionPerformed(AnActionEvent event) {
 
         DataContext dataContext = event.getDataContext();
         Module module = (Module) dataContext.getData(DataConstants.MODULE);
@@ -39,44 +42,36 @@ public class ExportAction extends AnAction
         File dir = selectFile(module);
         if (dir == null) {
             Messages.showMessageDialog("No file was selected!",
-                                       "Error", Messages.getErrorIcon());
+                    "Error", Messages.getErrorIcon());
             return;
         }
         Log.log("Selected file:" + dir.getAbsolutePath());
         String filename = virtualFile.getName();
-        String distPath = Setting.getSetting().getDistPath();
-        String artifactPattern = Setting.getSetting().getArtifactPattern();
-        String fullIvyURL = distPath + artifactPattern;
         if (filename.equals("ivy.xml")) {
-            String[] libs = new String[0];
+            List<String> libs = new ArrayList<String>();
             try {
-                libs = IvyUtil.getLibsFromIvy(virtualFile.getPath(), fullIvyURL, false);
+                libs = getLibs(virtualFile.getPath());
+                IdeaUtil.importLibToModuleLib(libs, module);
                 Log.log(Arrays.asList(libs));
-            }
-            catch (JDOMException e) {
-                IvyUtil.error(e);
-            }
-            catch (IOException e) {
-                IvyUtil.error(e);
+            } catch (Exception e) {
+                IdeaUtil.error(e);
             }
 
             try {
-                IvyUtil.exportLibToDirectory(libs, dir);
+                IdeaUtil.exportLibToDirectory(libs, dir);
                 Messages.showMessageDialog(module.getProject(), "export libs successfully",
-                                           "Information", Messages.getInformationIcon());
+                        "Information", Messages.getInformationIcon());
             }
             catch (IOException e) {
-                IvyUtil.error(e);
+                IdeaUtil.error(e);
             }
-        }
-        else {
+        } else {
             Messages.showMessageDialog(module.getProject(), "Only ivy.xml will be accepted",
-                                       "Wanning", Messages.getWarningIcon());
+                    "Wanning", Messages.getWarningIcon());
         }
     }
 
-    public void update(AnActionEvent e)
-    {
+    public void update(AnActionEvent e) {
         VirtualFile virtualFile = (VirtualFile) e.getDataContext().getData(DataConstants.VIRTUAL_FILE);
         if (virtualFile == null) {
             e.getPresentation().setEnabled(false);
@@ -86,18 +81,39 @@ public class ExportAction extends AnAction
         e.getPresentation().setEnabled("ivy.xml".equals(filename));
     }
 
-    public File selectFile(Module module)
-    {
+    public File selectFile(Module module) {
         FileChooserDescriptor fileDescriptor = FileChooserDescriptorFactory
-            .createSingleFolderDescriptor();
+                .createSingleFolderDescriptor();
         fileDescriptor.setTitle("Select lib path");
         fileDescriptor.setDescription("Select external graphics editor");
         VirtualFile[] virtualFiles = FileChooser.chooseFiles(module.getProject(), fileDescriptor);
         if (virtualFiles.length == 1 && virtualFiles[0].isDirectory()) {
             return new File(virtualFiles[0].getPath());
-        }
-        else {
+        } else {
             return null;
         }
+    }
+
+    private IvyFacade getIvyFacade(IvyConfig setting)
+            throws Exception {
+        IvyFacade ivyFacade = new IvyFacade();
+        ivyFacade.setIvyConfig(setting);
+        ivyFacade.resolve();
+        return ivyFacade;
+    }
+
+    private IvyConfig getIvyConfig() {
+        IvyConfig setting = new IvyConfig();
+//        setting.setCacheDir(null);
+        setting.setRepositoryDir(SettingHelper.getInstance().getSetting().getDistPath());
+//        setting.setIvySettingFile(null);
+        setting.setTransitive(true);
+        return setting;
+    }
+
+    private List<String> getLibs(String ivyFile) throws Exception {
+        IvyConfig ivyConfig = getIvyConfig();
+        ivyConfig.setIvyFile(ivyFile);
+        return getIvyFacade(ivyConfig).getJarArtifactsFilePath();
     }
 }
