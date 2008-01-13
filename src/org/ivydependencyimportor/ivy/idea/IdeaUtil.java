@@ -46,7 +46,7 @@ public class IdeaUtil {
         });
     }
 
-    public static void exportLibToDirectory(String[] libFiles, File dir) throws IOException {
+    public static void exportLibToDirectory(List<String> libFiles, File dir) throws IOException {
         Log.log("Start to export lib to dir:" + dir.getAbsolutePath());
         for (String lib : libFiles) {
             File libFile = new File(lib);
