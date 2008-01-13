@@ -8,13 +8,13 @@ import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.ui.Messages;
+import org.ivydependencyimportor.ivy.Log;
 
 import java.io.*;
 import java.util.List;
 
-import org.ivydependencyimportor.ivy.Log;
-
 /**
+ * Some useful tool about IDEA
  * @author <a href="mailto:gzkaneg@gmail.com">gzkaneg</a>
  */
 public class IdeaUtil {
