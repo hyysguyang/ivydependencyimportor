@@ -1,126 +1,232 @@
 <?xml version="1.0"?>
 <project name="ivydependencyimportor" basedir="." default="dist">
-	<property file="build.properties" />
-	<property name="build.dir" value="${basedir}/dist" />
+    <property file="build.properties"/>
+    <property name="build.dir" value="${basedir}/dist"/>
+    <available file="${idea.home}" property="idea.home.existed"/>
 
-	<path id="master-classpath">
-		<fileset dir="${lib.dir}">
-			<include name="**/*.jar" />
-		</fileset>
-	</path>
-	<path id="test-classpath">
-		<path refid="master-classpath" />
-		<pathelement path="${build.java.classes.dir}" />
-	</path>
+    <path id="idea-plugin-dev-classpath">
+        <fileset dir="${idea.home}/lib">
+            <include name="**/**.jar"/>
+        </fileset>
+    </path>
 
-
-	<target name="init" description="Init application structure">
-		<mkdir dir="${build.dir}" />
-		<mkdir dir="${build.classes.dir}" />
-		<mkdir dir="${build.java.classes.dir}" />
-		<mkdir dir="${build.test.classes.dir}" />
-		<mkdir dir="${build.unit.test.classes.dir}" />
-		<mkdir dir="${junit.reports.dir}" />
-		<mkdir dir="${junit.reports.dir}/xml" />
-		<echo>Init application structure completed!</echo>
-	</target>
+    <path id="master-classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    <path id="test-classpath">
+        <path refid="master-classpath"/>
+        <pathelement path="${build.java.classes.dir}"/>
+    </path>
 
 
-	<!-- Copy resource file -->
-	<target name="copy" depends="init">
-		<copy todir="${build.java.classes.dir}" preservelastmodified="true">
-			<fileset dir="${java.src.dir}" excludes="**/*.java" />
-		</copy>
-		<copy todir="${build.unit.test.classes.dir}" preservelastmodified="true">
-			<fileset dir="${unit.test.src.dir}" excludes="**/*.java" />
-		</copy>
-		<echo>Copy resource file completed!</echo>
-	</target>
+    <target name="init" description="Init application structure">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes.dir}"/>
+        <mkdir dir="${build.java.classes.dir}"/>
+        <mkdir dir="${build.test.classes.dir}"/>
+        <mkdir dir="${build.unit.test.classes.dir}"/>
+        <mkdir dir="${junit.reports.dir}"/>
+        <mkdir dir="${junit.reports.dir}/xml"/>
+        <echo>Init application structure completed!</echo>
+    </target>
 
-	<target name="build" depends="copy" description="Compile main source tree java files,Include java and test source">
-		<javac destdir="${build.java.classes.dir}" source="1.5" target="1.5" encoding="UTF-8" debug="true" deprecation="false"  optimize="false" failonerror="true">
-			<src path="${java.src.dir}" />
-			<classpath refid="master-classpath" />
-		</javac>
-		<javac destdir="${build.unit.test.classes.dir}" source="1.5" target="1.5" encoding="UTF-8" debug="true" deprecation="false" optimize="false" failonerror="true">
-			<src path="${unit.test.src.dir}" />
-			<classpath refid="test-classpath" />
-		</javac>
-		<echo>Compile main source tree java files completed!</echo>
-	</target>
 
-	<!--
+    <!-- Copy resource file -->
+    <target name="copy" depends="init">
+        <copy todir="${build.java.classes.dir}" preservelastmodified="true">
+            <fileset dir="${java.src.dir}" excludes="**/*.java,**/idea/**"/>
+        </copy>
+        <copy todir="${build.unit.test.classes.dir}" preservelastmodified="true">
+            <fileset dir="${unit.test.src.dir}" excludes="**/*.java,**/idea/**"/>
+        </copy>
+        <echo>Copy resource file completed!</echo>
+    </target>
+
+    <target name="copy-idea" depends="init">
+        <copy todir="${build.java.classes.dir}" preservelastmodified="true">
+            <fileset dir="${java.src.dir}" includes="**/idea/**" excludes="**/*.java"/>
+        </copy>
+        <copy todir="${build.unit.test.classes.dir}" preservelastmodified="true">
+            <fileset dir="${unit.test.src.dir}" includes="**/idea/**" excludes="**/*.java"/>
+        </copy>
+        <echo>Copy idea plugin resource file completed!</echo>
+    </target>
+
+    <target name="compile-idea" depends="copy,copy-idea"
+            description="Compile main source tree java files,Include java and test source">
+        <fail message="Please set property value of idea.home to valid IntelliJ Idea home dir to continure the build."
+              unless="idea.home.existed"/>
+
+        <javac destdir="${build.java.classes.dir}" source="1.5" target="1.5" encoding="UTF-8" debug="true"
+               deprecation="false" optimize="false" failonerror="true">
+            <classpath refid="idea-plugin-dev-classpath"/>
+            <classpath refid="master-classpath"/>
+            <src path="${java.src.dir}"/>
+            <include name="**/idea/**"/>
+        </javac>
+        <javac destdir="${build.unit.test.classes.dir}" source="1.5" target="1.5" encoding="UTF-8" debug="true"
+               deprecation="false" optimize="false" failonerror="true">
+            <classpath refid="idea-plugin-dev-classpath"/>
+            <classpath refid="master-classpath"/>
+            <classpath refid="test-classpath"/>
+            <src path="${unit.test.src.dir}"/>
+            <include name="**/idea/**"/>
+        </javac>
+        <echo>Compile idea plugin source tree java files completed!</echo>
+    </target>
+
+    <target name="compile-core" depends="copy"
+            description="Compile main source tree java files,Include java and test source">
+        <javac destdir="${build.java.classes.dir}" source="1.5" target="1.5" encoding="UTF-8" debug="true"
+               deprecation="false" optimize="false" failonerror="true">
+            <classpath refid="master-classpath"/>
+            <src path="${java.src.dir}"/>
+            <exclude name="**/idea/**"/>
+        </javac>
+        <javac destdir="${build.unit.test.classes.dir}" source="1.5" target="1.5" encoding="UTF-8" debug="true"
+               deprecation="false" optimize="false" failonerror="true">
+            <classpath refid="test-classpath"/>
+            <src path="${unit.test.src.dir}"/>
+            <exclude name="**/idea/**"/>
+        </javac>
+        <echo>Compile core source tree java files completed!</echo>
+    </target>
+
+    <target name="compile-all" depends="copy"
+            description="Compile main source tree java files,Include java and test source">
+        <antcall target="compile-idea"/>
+        <antcall target="compile-core"/>
+        <echo>Compile all source tree java files completed!</echo>
+    </target>
+
+    <!--
 		Generate javadoc for the main and JDK 1.5 sources.
 	-->
-	<target name="javadoc" depends="build" description="Generate framework Javadocs">
-		<delete dir="${javadoc.dir}" />
-		<mkdir dir="${javadoc.dir}" />
+    <target name="javadoc" depends="compile-all" description="Generate framework Javadocs">
+        <delete dir="${javadoc.dir}"/>
+        <mkdir dir="${javadoc.dir}"/>
 
-		<javadoc destdir="${javadoc.dir}" windowtitle="${project-title} API" doctitle="${project-title} API" source="1.5" access="package" author="true" version="true" use="true" charset="UTF-8" defaultexcludes="true">
-			<classpath refid="master-classpath" />
-			<packageset dir="${java.src.dir}" defaultexcludes="yes" />
-		</javadoc>
+        <javadoc destdir="${javadoc.dir}" windowtitle="${project-title} API" doctitle="${project-title} API"
+                 source="1.5" access="package" author="true" version="true" use="true" charset="UTF-8"
+                 defaultexcludes="true">
+            <classpath refid="idea-plugin-dev-classpath"/>
+            <classpath refid="master-classpath"/>
+            <packageset dir="${java.src.dir}" defaultexcludes="yes"/>
+        </javadoc>
 
-	</target>
+    </target>
 
-	<target name="jarfile" depends="build" description="Create main jar file and test jar file">
-		<delete file="${build.dir}/*.jar" />
-		<jar jarfile="${build.dir}/${project.name}.jar">
-			<fileset dir="${build.java.classes.dir}" />
-			<manifest>
-				<attribute name="Implementation-Title" value="${project-title}" />
-				<attribute name="Implementation-Version" value="${project-version}" />
-			</manifest>
-		</jar>
-		<echo>Create main jar file completed!</echo>
-		<jar jarfile="${build.dir}/${project.name}-Test.jar">
-			<fileset dir="${build.unit.test.classes.dir}" />
-			<manifest>
-				<attribute name="Implementation-Title" value="${project-title}" />
-				<attribute name="Implementation-Version" value="${project-version}" />
-			</manifest>
-		</jar>
-		<echo>Create test jar file completed!</echo>
-	</target>
-
-	<target name="unit-test" depends="jarfile" description="Run JUnit Tests">
-		<junit printsummary="on" fork="yes" haltonfailure="false" failureproperty="tests.failed" showoutput="true">
-			<classpath refid="test-classpath" />
-			<classpath location="${build.unit.test.classes.dir}" />
-			<!-- <formatter type="brief" usefile="false" /> -->
-			<formatter type="plain" usefile="false" />
-			<formatter type="xml" />
-			<batchtest fork="yes" todir="${junit.reports.dir}/xml">
-				<fileset dir="${build.unit.test.classes.dir}">
-					<include name="**/*Test.*" />
-				</fileset>
-			</batchtest>
-		</junit>
-
-		<echo>Run all unit tests completed!</echo>
-		<junitreport todir="${junit.reports.dir}">
-			<fileset dir="${junit.reports.dir}/xml">
-				<include name="TEST-*.xml" />
-			</fileset>
-			<report format="frames" todir="${junit.reports.dir}" />
-		</junitreport>
-		<echo>Generate unit test report completed!</echo>
-		<fail if="tests.failed">At least one test failed!</fail>
-
-	</target>
+    <target name="jar-core" depends="compile-core" description="Create main jar file and test jar file">
+        <delete file="${build.dir}/*.jar"/>
+        <jar jarfile="${build.dir}/${project.name}-core.jar">
+            <fileset dir="${build.java.classes.dir}" excludes="**/idea/**"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="${project-title}"/>
+                <attribute name="Implementation-Version" value="${project-version}"/>
+            </manifest>
+        </jar>
+        <echo>Create core jar file completed!</echo>
+        <jar jarfile="${build.dir}/${project.name}-core-test.jar">
+            <fileset dir="${build.unit.test.classes.dir}" excludes="**/idea/**"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="${project-title}"/>
+                <attribute name="Implementation-Version" value="${project-version}"/>
+            </manifest>
+        </jar>
+        <echo>Create core test jar file completed!</echo>
+    </target>
 
 
-	<!-- =================================
+    <target name="jar-idea" depends="compile-idea" description="Create main jar file and test jar file">
+        <fail message="Please set property value of idea.home to valid IntelliJ Idea home dir to continure the build."
+              unless="idea.home.existed"/>
+        <delete file="${build.dir}/*.jar"/>
+        <jar jarfile="${build.dir}/${project.name}-idea.jar">
+            <fileset dir="${build.java.classes.dir}" includes="**/idea/**"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="${project-title}"/>
+                <attribute name="Implementation-Version" value="${project-version}"/>
+            </manifest>
+        </jar>
+        <echo>Create idea plugin jar file completed!</echo>
+        <jar jarfile="${build.dir}/${project.name}-idea-test.jar">
+            <fileset dir="${build.unit.test.classes.dir}" includes="**/idea/**"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="${project-title}"/>
+                <attribute name="Implementation-Version" value="${project-version}"/>
+            </manifest>
+        </jar>
+        <echo>Create idea plugin test jar file completed!</echo>
+    </target>
+
+    <target name="unit-core-test" depends="jar-core" description="Run JUnit Tests">
+        <junit printsummary="on" fork="yes" haltonfailure="false" failureproperty="tests.failed" showoutput="true">
+            <classpath refid="test-classpath"/>
+            <classpath location="${build.unit.test.classes.dir}"/>
+            <!-- <formatter type="brief" usefile="false" /> -->
+            <formatter type="plain" usefile="false"/>
+            <formatter type="xml"/>
+            <batchtest fork="yes" todir="${junit.reports.dir}/xml">
+                <fileset dir="${build.unit.test.classes.dir}">
+                    <include name="**/*Test.*"/>
+                    <exclude name="**/idea/*Test.*"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <echo>Run core unit tests completed!</echo>
+        <junitreport todir="${junit.reports.dir}">
+            <fileset dir="${junit.reports.dir}/xml">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.reports.dir}"/>
+        </junitreport>
+        <echo>Generate core unit test report completed!</echo>
+        <fail if="tests.failed">At least one test failed!</fail>
+
+    </target>
+
+    <target name="unit-idea-test" depends="jar-idea" description="Run JUnit Tests">
+        <junit printsummary="on" fork="yes" haltonfailure="false" failureproperty="tests.failed" showoutput="true">
+            <classpath refid="idea-plugin-dev-classpath"/>
+            <classpath refid="test-classpath"/>
+            <classpath location="${build.unit.test.classes.dir}"/>
+            <!-- <formatter type="brief" usefile="false" /> -->
+            <formatter type="plain" usefile="false"/>
+            <formatter type="xml"/>
+            <batchtest fork="yes" todir="${junit.reports.dir}/xml">
+                <fileset dir="${build.unit.test.classes.dir}">
+                    <include name="**/idea/*Test.*"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <echo>Run idea unit tests completed!</echo>
+        <junitreport todir="${junit.reports.dir}">
+            <fileset dir="${junit.reports.dir}/xml">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.reports.dir}"/>
+        </junitreport>
+        <echo>Generate idea unit test report completed!</echo>
+        <fail if="tests.failed">At least one test failed!</fail>
+
+    </target>
+
+
+    <!-- =================================
           target: Run all test suite
          ================================= -->
-	<target name="test-all" depends="unit-test" description="--> Run all test suite" />
+    <target name="test-all" depends="clean,unit-core-test,unit-idea-test" description="--> Run all test suite"/>
 
-	<target name="dist" depends="clean,test-all" description="--> Build the dist jar" />
+    <target name="dist" depends="clean,test-all" description="--> Build the dist jar"/>
 
-	<target name="clean" description="Clean output directories">
-		<delete dir="${build.dir}" />
-		<delete dir="${target.dir}" />
-	</target>
+    <target name="clean" description="Clean output directories">
+        <delete dir="${build.dir}"/>
+        <delete dir="${target.dir}"/>
+    </target>
 
 
 </project>
