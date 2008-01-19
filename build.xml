@@ -22,13 +22,13 @@
 
 
     <target name="init" description="Init application structure">
-        <mkdir dir="${build.dir}"/>
-        <mkdir dir="${build.classes.dir}"/>
+        <mkdir dir="${dist.dir}"/>
         <mkdir dir="${build.java.classes.dir}"/>
-        <mkdir dir="${build.test.classes.dir}"/>
+        <mkdir dir="${build.artifact}"/>
         <mkdir dir="${build.unit.test.classes.dir}"/>
-        <mkdir dir="${junit.reports.dir}"/>
-        <mkdir dir="${junit.reports.dir}/xml"/>
+        <mkdir dir="${build.junit.reports.dir}"/>
+        <mkdir dir="${build.junit.reports.dir}/xml"/>
+        <mkdir dir="${build.idea-plugin-dir}"/>
         <echo>Init application structure completed!</echo>
     </target>
 
@@ -119,8 +119,7 @@
     </target>
 
     <target name="jar-core" depends="compile-core" description="Create main jar file and test jar file">
-        <delete file="${build.dir}/*.jar"/>
-        <jar jarfile="${build.dir}/${project.name}-core.jar">
+        <jar jarfile="${build.artifact}/${project.name}-core.jar">
             <fileset dir="${build.java.classes.dir}" excludes="**/idea/**"/>
             <manifest>
                 <attribute name="Implementation-Title" value="${project-title}"/>
@@ -128,7 +127,7 @@
             </manifest>
         </jar>
         <echo>Create core jar file completed!</echo>
-        <jar jarfile="${build.dir}/${project.name}-core-test.jar">
+        <jar jarfile="${build.artifact}/${project.name}-core-test.jar">
             <fileset dir="${build.unit.test.classes.dir}" excludes="**/idea/**"/>
             <manifest>
                 <attribute name="Implementation-Title" value="${project-title}"/>
@@ -142,16 +141,15 @@
     <target name="jar-idea" depends="compile-idea" description="Create main jar file and test jar file">
         <fail message="Please set property value of idea.home to valid IntelliJ Idea home dir to continure the build."
               unless="idea.home.existed"/>
-        <delete file="${build.dir}/*.jar"/>
-        <jar jarfile="${build.dir}/${project.name}-idea.jar">
-            <fileset dir="${build.java.classes.dir}" includes="**/idea/**"/>
+        <jar jarfile="${build.artifact}/${project.name}-idea.jar">
+            <fileset dir="${build.java.classes.dir}"/>
             <manifest>
                 <attribute name="Implementation-Title" value="${project-title}"/>
                 <attribute name="Implementation-Version" value="${project-version}"/>
             </manifest>
         </jar>
         <echo>Create idea plugin jar file completed!</echo>
-        <jar jarfile="${build.dir}/${project.name}-idea-test.jar">
+        <jar jarfile="${build.artifact}/${project.name}-idea-test.jar">
             <fileset dir="${build.unit.test.classes.dir}" includes="**/idea/**"/>
             <manifest>
                 <attribute name="Implementation-Title" value="${project-title}"/>
@@ -168,7 +166,7 @@
             <!-- <formatter type="brief" usefile="false" /> -->
             <formatter type="plain" usefile="false"/>
             <formatter type="xml"/>
-            <batchtest fork="yes" todir="${junit.reports.dir}/xml">
+            <batchtest fork="yes" todir="${build.junit.reports.dir}/xml">
                 <fileset dir="${build.unit.test.classes.dir}">
                     <include name="**/*Test.*"/>
                     <exclude name="**/idea/*Test.*"/>
@@ -177,11 +175,11 @@
         </junit>
 
         <echo>Run core unit tests completed!</echo>
-        <junitreport todir="${junit.reports.dir}">
-            <fileset dir="${junit.reports.dir}/xml">
+        <junitreport todir="${build.junit.reports.dir}">
+            <fileset dir="${build.junit.reports.dir}/xml">
                 <include name="TEST-*.xml"/>
             </fileset>
-            <report format="frames" todir="${junit.reports.dir}"/>
+            <report format="frames" todir="${build.junit.reports.dir}"/>
         </junitreport>
         <echo>Generate core unit test report completed!</echo>
         <fail if="tests.failed">At least one test failed!</fail>
@@ -196,7 +194,7 @@
             <!-- <formatter type="brief" usefile="false" /> -->
             <formatter type="plain" usefile="false"/>
             <formatter type="xml"/>
-            <batchtest fork="yes" todir="${junit.reports.dir}/xml">
+            <batchtest fork="yes" todir="${build.junit.reports.dir}/xml">
                 <fileset dir="${build.unit.test.classes.dir}">
                     <include name="**/idea/*Test.*"/>
                 </fileset>
@@ -204,11 +202,11 @@
         </junit>
 
         <echo>Run idea unit tests completed!</echo>
-        <junitreport todir="${junit.reports.dir}">
-            <fileset dir="${junit.reports.dir}/xml">
+        <junitreport todir="${build.junit.reports.dir}">
+            <fileset dir="${build.junit.reports.dir}/xml">
                 <include name="TEST-*.xml"/>
             </fileset>
-            <report format="frames" todir="${junit.reports.dir}"/>
+            <report format="frames" todir="${build.junit.reports.dir}"/>
         </junitreport>
         <echo>Generate idea unit test report completed!</echo>
         <fail if="tests.failed">At least one test failed!</fail>
@@ -221,10 +219,26 @@
          ================================= -->
     <target name="test-all" depends="clean,unit-core-test,unit-idea-test" description="--> Run all test suite"/>
 
-    <target name="dist" depends="clean,test-all" description="--> Build the dist jar"/>
+    <target name="build-idea-plugin" depends="clean,jar-core,jar-idea" description="Create main jar file and test jar file">
+        <copy todir="${build.idea-plugin-dir}/${project.name}-idea-plugin/lib" overwrite="true">
+            <fileset dir="${lib.dir}" includes="**/**.jar"/>
+            <fileset dir="${build.artifact}" includes="**/**.jar" excludes="**/**test.jar"/>
+        </copy>
+        <copy todir="${build.idea-plugin-dir}/${project.name}-idea-plugin/META-INF" overwrite="true" file="${idea-plugin-xml}"/>
+        <zip destfile="${dist.dir}/${project.name}-idea-plugin.zip" basedir="${build.idea-plugin-dir}">
+
+        </zip>
+
+        <echo>Build idea plugin zip file completed!</echo>
+    </target>
+    <target name="dist" depends="clean,test-all,build-idea-plugin" description="--> Build the dist jar">
+        <copy todir="${dist.dir}" overwrite="true">
+            <fileset dir="${build.artifact}" includes="**/**.jar" excludes="**/**test.jar"/>
+        </copy>
+    </target>
 
     <target name="clean" description="Clean output directories">
-        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
         <delete dir="${target.dir}"/>
     </target>
 
