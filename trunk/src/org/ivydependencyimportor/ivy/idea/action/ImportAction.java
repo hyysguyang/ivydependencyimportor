@@ -9,8 +9,10 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.ivydependencyimportor.ivy.IvyConfig;
 import org.ivydependencyimportor.ivy.IvyFacade;
+import org.ivydependencyimportor.ivy.Log;
 import org.ivydependencyimportor.ivy.idea.IdeaUtil;
 import org.ivydependencyimportor.ivy.idea.setting.SettingHelper;
+import org.ivydependencyimportor.ivy.idea.setting.Setting;
 
 import java.util.List;
 
@@ -38,10 +40,12 @@ public class ImportAction extends AnAction {
         if (fileName.equals(DEFAULT_IVY_FILE_NAME)) {
             try {
                 List<String> libs = getLibs(ivyFilePath);
+                Log.log("import libs:" + libs);
                 IdeaUtil.importLibToModuleLib(libs, module);
                 Messages.showMessageDialog(module.getProject(), "Import libs successfully",
                         "Information", Messages.getInformationIcon());
             } catch (Exception e1) {
+                Log.log(e1);
                 Messages.showMessageDialog(module.getProject(), "Import libs failed",
                         "Error", Messages.getInformationIcon());
             }
@@ -73,10 +77,12 @@ public class ImportAction extends AnAction {
 
     private IvyConfig getIvyConfig() {
         IvyConfig setting = new IvyConfig();
+        Setting ivyUISetting = SettingHelper.getInstance().getSetting();
+        setting.setRepositoryDir(ivyUISetting.getDistPath());
+        setting.setArtifactPattern(ivyUISetting.getArtifactPattern());
+        setting.setTransitive(ivyUISetting.isTransitive());
 //        setting.setCacheDir(null);
-        setting.setRepositoryDir(SettingHelper.getInstance().getSetting().getDistPath());
 //        setting.setIvySettingFile(null);
-        setting.setTransitive(true);
         return setting;
     }
 

@@ -99,4 +99,12 @@ public class IvyConfig {
     public boolean isTransitive() {
         return transitive;
     }
+
+    public String getArtifactPattern() {
+        throw new UnsupportedOperationException("The method is not supported yet");
+    }
+
+    public void setArtifactPattern(String artifactPattern) {
+        throw new UnsupportedOperationException("The method is not supported yet");
+    }
 }
