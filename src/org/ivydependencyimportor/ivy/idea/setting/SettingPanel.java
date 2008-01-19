@@ -1,7 +1,5 @@
 package org.ivydependencyimportor.ivy.idea.setting;
 
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -16,10 +14,7 @@ import org.ivydependencyimportor.ivy.Log;
 import javax.swing.*;
 import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.ResourceBundle;
 
@@ -29,61 +24,65 @@ import java.util.ResourceBundle;
 public class SettingPanel {
     private JPanel mainPanel;
     private TextFieldWithBrowseButton distLibPath;
-    private JButton help;
     private JTextField artifactPattern;
     private JTextField fullUrl;
+    private JCheckBox isTransitive;
 
     public SettingPanel() {
         distLibPath.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Application application = ApplicationManager.getApplication();
-                application.runWriteAction(new Runnable() {
-                    public void run() {
-                        VirtualFile previous = LocalFileSystem.getInstance().refreshAndFindFileByPath(
-                                distLibPath.getText().replace('\\', '/')
-                        );
+                VirtualFile previous = LocalFileSystem.getInstance().refreshAndFindFileByPath(
+                        distLibPath.getText().replace('\\', '/')
+                );
 
-                        FileChooserDescriptor fileDescriptor = FileChooserDescriptorFactory
-                                .createSingleFolderDescriptor();
-                        fileDescriptor.setShowFileSystemRoots(true);
-                        fileDescriptor.setTitle("Select lib path");
-                        fileDescriptor.setDescription("Select lib path for dist");
-                        VirtualFile[] virtualFiles = FileChooser.chooseFiles(distLibPath, fileDescriptor, previous);
-
-                        Log.log(virtualFiles.length);
-                        if (virtualFiles.length > 0) {
-                            String path = virtualFiles[0].getPath();
-                            Log.log(path);
-                            if (!path.endsWith("/")) {
-                                path = path + "/";
-                            }
-                            distLibPath.setText(path);
-                            fullUrl.setText(distLibPath.getText() + artifactPattern.getText());
-                        }
+                FileChooserDescriptor fileDescriptor = FileChooserDescriptorFactory
+                        .createSingleFolderDescriptor();
+                fileDescriptor.setShowFileSystemRoots(true);
+                fileDescriptor.setTitle("Select lib path");
+                fileDescriptor.setDescription("Select lib path for dist");
+                VirtualFile[] virtualFiles = FileChooser.chooseFiles(distLibPath, fileDescriptor, previous);
+                Log.log(virtualFiles.length);
+                if (virtualFiles.length > 0) {
+                    String path = virtualFiles[0].getPath();
+                    Log.log(path);
+                    if (!path.endsWith("/")) {
+                        path = path + "/";
                     }
-                });
+                    distLibPath.setText(path);
+                    setFullUrl();
+                }
             }
         });
-
-        help.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String doc = "/help/help.html";
-                perform(doc);
-            }
-        });
-        artifactPattern.addKeyListener(new KeyListener() {
-            public void keyTyped(KeyEvent e) {
-
-            }
-
+        distLibPath.getTextField().addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
+                setFullUrl();
+            }
 
+            public void keyTyped(KeyEvent e) {
+                setFullUrl();
             }
 
             public void keyReleased(KeyEvent e) {
-                fullUrl.setText(distLibPath.getText() + artifactPattern.getText());
+                setFullUrl();
             }
         });
+        artifactPattern.addKeyListener(new KeyAdapter() {
+            public void keyPressed(KeyEvent e) {
+                setFullUrl();
+            }
+
+            public void keyTyped(KeyEvent e) {
+                setFullUrl();
+            }
+
+            public void keyReleased(KeyEvent e) {
+                setFullUrl();
+            }
+        });
+    }
+
+    private void setFullUrl() {
+        fullUrl.setText(distLibPath.getText() + artifactPattern.getText());
     }
 
     public void perform(String fDocument) {
@@ -122,21 +121,25 @@ public class SettingPanel {
     }
 
     public boolean isChanged() {
-        fullUrl.setText(distLibPath.getText() + artifactPattern.getText());
-        return !distLibPath.getText().equals(SettingHelper.getInstance().getSetting().getDistPath()) ||
-                !artifactPattern.getText().equals(SettingHelper.getInstance().getSetting().getArtifactPattern());
+//        fullUrl.setText(distLibPath.getText() + artifactPattern.getText());
+        Setting setting = SettingHelper.getInstance().getSetting();
+        return !distLibPath.getText().equals(setting.getDistPath()) ||
+                !artifactPattern.getText().equals(setting.getArtifactPattern()) ||
+                isTransitive.isSelected() != setting.isTransitive();
     }
 
     public void saveSettings() {
         Setting setting = SettingHelper.getInstance().getSetting();
         setting.setDistPath(distLibPath.getText());
         setting.setArtifactPattern(artifactPattern.getText());
+        setting.setTransitive(isTransitive.isSelected());
     }
 
     public void readSettings() {
         Setting setting = SettingHelper.getInstance().getSetting();
         distLibPath.setText(setting.getDistPath());
         artifactPattern.setText(setting.getArtifactPattern());
+        isTransitive.setSelected(setting.isTransitive());
     }
 
     {
@@ -188,14 +191,6 @@ public class SettingPanel {
                 GridConstraints.SIZEPOLICY_WANT_GROW,
                 GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null,
                 0, false));
-        help = new JButton();
-        help.setText("Button");
-        help.setVisible(false);
-        mainPanel.add(help, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER,
-                GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK |
-                GridConstraints.SIZEPOLICY_CAN_GROW,
-                GridConstraints.SIZEPOLICY_FIXED, null,
-                null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         mainPanel.add(spacer1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER,
                 GridConstraints.FILL_VERTICAL, 1,

@@ -48,13 +48,15 @@ public class ExportAction extends AnAction {
         Log.log("Selected file:" + dir.getAbsolutePath());
         String filename = virtualFile.getName();
         if (filename.equals("ivy.xml")) {
-            List<String> libs = new ArrayList<String>();
+            List<String> libs;
             try {
                 libs = getLibs(virtualFile.getPath());
                 IdeaUtil.importLibToModuleLib(libs, module);
                 Log.log(Arrays.asList(libs));
             } catch (Exception e) {
+                Log.log(e);
                 IdeaUtil.error(e);
+                return;
             }
 
             try {
@@ -85,7 +87,6 @@ public class ExportAction extends AnAction {
         FileChooserDescriptor fileDescriptor = FileChooserDescriptorFactory
                 .createSingleFolderDescriptor();
         fileDescriptor.setTitle("Select lib path");
-        fileDescriptor.setDescription("Select external graphics editor");
         VirtualFile[] virtualFiles = FileChooser.chooseFiles(module.getProject(), fileDescriptor);
         if (virtualFiles.length == 1 && virtualFiles[0].isDirectory()) {
             return new File(virtualFiles[0].getPath());

@@ -45,15 +45,6 @@
           <enabled value="true"/>
         </properties>
       </component>
-      <component id="1b329" class="javax.swing.JButton" binding="help">
-        <constraints>
-          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Button"/>
-          <visible value="false"/>
-        </properties>
-      </component>
       <vspacer id="e60b">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
@@ -74,6 +65,7 @@
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
             <minimum-size width="-1" height="20"/>
+            <preferred-size width="11" height="74"/>
             <maximum-size width="-1" height="20"/>
           </grid>
         </constraints>
@@ -88,12 +80,27 @@
       </component>
       <component id="7a5b7" class="javax.swing.JLabel">
         <constraints>
-          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="94" height="74"/>
+          </grid>
         </constraints>
         <properties>
           <text resource-bundle="org/ivydependencyimportor/ivy/idea/res/ivy" key="full_artifact_url"/>
         </properties>
       </component>
+      <component id="9f0f2" class="javax.swing.JCheckBox" binding="isTransitive">
+        <constraints>
+          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text resource-bundle="org/ivydependencyimportor/ivy/idea/res/ivy" key="transitive"/>
+        </properties>
+      </component>
+      <vspacer id="7e240">
+        <constraints>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
     </children>
   </grid>
 </form>
