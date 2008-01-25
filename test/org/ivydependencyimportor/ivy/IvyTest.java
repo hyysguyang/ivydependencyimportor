@@ -18,44 +18,38 @@
  */
 package org.ivydependencyimportor.ivy;
 
-import java.io.File;
-import java.util.List;
-
 import org.apache.ivy.util.FileUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.util.List;
+
 /**
  * @author <a href="mailto:hyysguyang@gmail.com">Numen</a>
  * @version 1.0 2007-11-18 0:33:51
  */
-public class IvyTest
-{
-
-    //String baseDir = IvyTest.class.getResource("repo/org1/mod1.1/jars/mod1.1-1.0.jar").getFile();
+public class IvyTest {
     private String cache;
     private IvyConfig ivyConfig;
 
     @Before
     public void setUp()
-            throws Exception
-    {
+            throws Exception {
         this.cache = IvyTest.class.getResource("/cache").getFile();
         this.ivyConfig = getIvyConfig();
     }
 
     @After
     public void tearDown()
-            throws Exception
-    {
+            throws Exception {
         this.ivyConfig = null;
         cleanCache();
     }
 
-    private void cleanCache()
-    {
+    private void cleanCache() {
         File cacheFile = new File(this.cache);
         FileUtil.forceDelete(cacheFile);
         cacheFile.mkdir();
@@ -63,35 +57,38 @@ public class IvyTest
 
     @Test
     public void testGetJarArtifactsFilePathInLocalRepo()
-            throws Exception
-    {
-
-	//expected:<...runk\target\classes\[java]\repo\org1\mod1.1\ja...>
-	//but was:<...runk\target\classes\[test]\repo\org1\mod1.1\ja...>
-
+            throws Exception {
         this.ivyConfig.setUseLocalRepository(true);
-        System.out.println("##########################################");
-        System.out.println(IvyTest.class.getResource("/repo/org1/mod1.1/jars/mod1.1-1.0.jar").getFile());
+
+//        System.setProperty("ivy.repo.dir",ivyConfig.getRepositoryDir())   ;
         List<String> pathinLocalRepo = getIvyHepler(this.ivyConfig).getJarArtifactsFilePath();
         Assert.assertEquals(2, pathinLocalRepo.size());
-        String expected =IvyTest.class.getResource("/repo/org1/mod1.1/jars/mod1.1-1.0.jar").getFile().substring(1);
+        String expected = IvyTest.class.getResource("/repo/org1/mod1.1/jars/mod1.1-1.0.jar").getFile().substring(1);
         Assert.assertEquals(expected.replace("/", File.separator), pathinLocalRepo.get(0));
     }
 
     @Test
     public void testGetJarArtifactsFilePathInLocalCache()
-            throws Exception
-    {
-        this.ivyConfig.setUseCache(true);
+            throws Exception {
+        doTestWithCache();
+    }
 
+
+    @Test
+    public void testDefaultVariableInSettingFile()
+            throws Exception {
+        ivyConfig.setIvySettingFile(IvyTest.class.getResource("ivysettings_default_variable_test.xml").getFile());
+
+        doTestWithCache();
+    }
+
+    private void doTestWithCache() throws Exception {
+        this.ivyConfig.setUseCache(true);
         List<String> pathinLocalRepo = getIvyHepler(this.ivyConfig).getJarArtifactsFilePath();
         Assert.assertEquals(2, pathinLocalRepo.size());
         String expected = IvyTest.class.getResource("/cache/org1/mod1.1/jars/mod1.1-1.0.jar").getFile().substring(1);
         Assert.assertEquals(expected.replace("/", File.separator), pathinLocalRepo.get(0));
     }
-
-
-
 
 //    @Test
 //    public void testGetArtifactsIncludeSource()
@@ -108,16 +105,14 @@ public class IvyTest
 
 
     private IvyFacade getIvyHepler(IvyConfig setting)
-            throws Exception
-    {
+            throws Exception {
         IvyFacade ivyFacade = new IvyFacade();
         ivyFacade.setIvyConfig(setting);
         ivyFacade.resolve();
         return ivyFacade;
     }
 
-    private IvyConfig getIvyConfig()
-    {
+    private IvyConfig getIvyConfig() {
         IvyConfig setting = new IvyConfig();
         setting.setCacheDir(this.cache);
         setting.setRepositoryDir(IvyTest.class.getResource("/repo").getFile());
