@@ -6,10 +6,17 @@ package org.ivydependencyimportor.ivy;
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.cache.CacheManager;
 import org.apache.ivy.core.module.descriptor.Artifact;
+import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
+import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ResolveReport;
-import org.apache.ivy.core.settings.IvySettings;
+import org.apache.ivy.core.resolve.ResolveOptions;
+import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
+import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
+import org.apache.ivy.plugins.repository.url.URLResource;
+import org.apache.ivy.util.Message;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +31,7 @@ public class IvyFacade {
 
     private Ivy ivy = null;
     private ResolveReport resolveReport;
-    private static final String IVY_REPO_DIR = "ivy.repo.dir";
+
 
     /**
      * Get the full file path of jar artifacts
@@ -36,15 +43,14 @@ public class IvyFacade {
     public List<String> getJarArtifactsFilePath() {
         List<Artifact> arti = getArtifacts();
         List<String> list = new ArrayList<String>();
-        CacheManager cacheManager = ivy.getCacheManager(new File(ivyConfig.getCacheDir()));
+        CacheManager cacheManager = ivy.getCacheManager(ivy.getSettings().getDefaultCache());
         for (Artifact artifact : arti) {
             list.add(cacheManager.getArchiveFileInCache(artifact).getAbsolutePath());
         }
         return list;
     }
 
-    private List<Artifact> getArtifacts()
-    {
+    private List<Artifact> getArtifacts() {
         return (List<Artifact>) resolveReport.getArtifacts();
     }
 
@@ -52,16 +58,32 @@ public class IvyFacade {
         this.ivyConfig = ivyConfig;
     }
 
+
     public void resolve() throws Exception {
         ivy = Ivy.newInstance();
-        ivy.setVariable(IVY_REPO_DIR, ivyConfig.getRepositoryDir());
-
         ivy.configure(new File(ivyConfig.getIvySettingFile()));
-        IvySettings ivySettings = ivy.getSettings();
-        if (ivyConfig.getCache() == null) {
-            ivyConfig.setCacheDir(ivySettings.getDefaultCache().getAbsolutePath());
-        }
-        ivySettings.setDefaultCache(ivyConfig.getCache());
-        resolveReport = ivy.resolve(new File(ivyConfig.getIvyFile()).toURI().toURL(), ivyConfig.getResolveOptions());
+        URL ivySource = new File(ivyConfig.getIvyFile()).toURL();
+        ResolveOptions options = ivyConfig.getResolveOptions();
+        ModuleDescriptor md = parseModuleDescriptor(ivySource, options);
+        resolveReport = ivy.resolve(md, options);
     }
+
+    private ModuleDescriptor parseModuleDescriptor(URL ivySource, ResolveOptions options)
+            throws Exception {
+        URLResource res = new URLResource(ivySource);
+        ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser(res);
+        Message.verbose("using " + parser + " to parse " + ivySource);
+        ModuleDescriptor md = parser.parseDescriptor(ivy.getSettings(), ivySource, options.isValidate());
+        String revision = options.getRevision();
+        if (revision == null &&
+                md.getResolvedModuleRevisionId().getRevision() == null) {
+            revision = Ivy.getWorkingRevision();
+        }
+        if (revision != null) {
+            md.setResolvedModuleRevisionId(ModuleRevisionId.newInstance(md.getModuleRevisionId(),revision));
+        }
+        return md;
+    }
+
+
 }

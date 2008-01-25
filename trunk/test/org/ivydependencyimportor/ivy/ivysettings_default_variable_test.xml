@@ -2,8 +2,8 @@
     <settings defaultCache="${ivy.cache.dir}" defaultResolver="local"/>
     <resolvers>
         <filesystem name="local" m2compatible="true">
-            <ivy pattern="${ivy.repository.dir}/[organisation]/[module]/ivys/ivy-[revision].xml"/>
-            <artifact pattern="${ivy.repository.dir}/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+            <ivy pattern="${ivy.repository.dir}/${ivy_pattern}"/>
+            <artifact pattern="${ivy.repository.dir}/${artifact_pattern}"/>
         </filesystem>
     </resolvers>
 </ivysettings>
