@@ -28,8 +28,9 @@ public class IvyConfig {
     private static final String DEFAULT_ARTIFACT_PATTERN = "[organisation]/[module]/[type]s/[artifact]-[revision].[ext]";
     private static final String DEFAULT_IVY_PATTERN = "[organisation]/[module]/ivys/ivy-[revision].xml";
     private static final String DEFAULT_IVY_SETTING_FILE_NAME = "ivysettings.xml";
+    private static final String DEFAULT_IVY_SETTINGS=IvyConfig.class.getResource("/META-INF/"+DEFAULT_IVY_SETTING_FILE_NAME).getPath();
 
-    private String ivySettingFile;
+    private String ivySettingFile=DEFAULT_IVY_SETTINGS;
     private String ivyFile;
     private boolean useCache = false;
     private boolean transitive;
@@ -57,11 +58,11 @@ public class IvyConfig {
     }
 
     public void setIvySettingFile(String ivysettings) {
-
         if(isEmpty(ivysettings)) {
             Message.debug("Invalid ivy settiong file path: ivy settiong file path must not be empty,use the default ivy settiong file of ivydependdencyimpotor.");
-            this.ivySettingFile = getDefaultIvySetting();
-            Message.debug("Default ivy pattern: "+ivySettingFile);
+            Message.debug("Default ivy settiong file: "+ivySettingFile);
+            this.ivySettingFile=DEFAULT_IVY_SETTINGS;
+            return;
         }
 
         this.ivySettingFile = ivysettings;
@@ -103,9 +104,9 @@ public class IvyConfig {
             Message.debug("Invalid artifact pattern: artifact pattern must not be empty,use the default artifact pattern");
             Message.debug("Default artifact pattern: "+DEFAULT_ARTIFACT_PATTERN);
             System.setProperty(ARTIFACT_PATTERN_VARIABLE,DEFAULT_ARTIFACT_PATTERN);
-        } else{
-            System.setProperty(ARTIFACT_PATTERN_VARIABLE,artifactPattern);
+            return;
         }
+        System.setProperty(ARTIFACT_PATTERN_VARIABLE,artifactPattern);
     }
 
 
@@ -118,10 +119,9 @@ public class IvyConfig {
             Message.debug("Invalid ivy pattern: ivy pattern must not be empty,use the default ivy pattern");
             Message.debug("Default ivy pattern: "+DEFAULT_IVY_PATTERN);
             System.setProperty(IVY_PATTERN_VARIABLE,DEFAULT_IVY_PATTERN);
-        } else{
-            System.setProperty(IVY_PATTERN_VARIABLE,ivyPattern);
+            return ;
         }
-
+            System.setProperty(IVY_PATTERN_VARIABLE,ivyPattern);
     }
 
     public void setRepositoryDir(String repositoryDir) {
@@ -137,23 +137,5 @@ public class IvyConfig {
             return ;
         }
         System.setProperty(IVY_CACHE_VARIABLE,cacheDir);
-    }
-
-
-
-    public String getDefaultIvySetting() {
-        // TODO: give another more elegant solution
-        // FIXME:We will put our default ivy setting file in some directory because the ivy setting file may be edit
-        //  It's disappoint that we can't put the file in our jar because we using it，so we put the file in the
-        //  parent directory of lib that the jar locating. current the directory is as bellow.
-        //    basedir/lib/*.jar (include ivydependencyimportor-idea.jar)
-        //    basedir/conf/ivysettings.xml
-        //  this is a very bad solution,shall we give another more elegant solution?
-        URL currentClassFileResource= this.getClass().getResource("org/ivydependencyimportor/ivy/IvyConfig.class");
-              if(currentClassFileResource==null)  {
-                  throw new RuntimeException("The core jar of the project is not found,please give me the jar to work.");
-              }
-        String jarFileLocationBaseDir=currentClassFileResource.getPath().substring(0,currentClassFileResource.getPath().indexOf("/lib/"));
-        return jarFileLocationBaseDir+ File.separator+"conf"+File.separator+DEFAULT_IVY_SETTING_FILE_NAME;
     }
 }
